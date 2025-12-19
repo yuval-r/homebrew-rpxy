@@ -4,21 +4,20 @@ class Rpxy < Formula
   license "Apache-2.0"
 
   depends_on "rust" => :build
-  depends_on "git-lfs"
 
-  resource "rpxy-source" do
-    url "https://github.com/junkurihara/rust-rpxy.git", tag: "0.10.3"
-  end
+  # Use submodules: false to prevent automatic submodule update during download
+  # We'll handle submodules manually in install with LFS skip configured
+  url "https://github.com/junkurihara/rust-rpxy.git", tag: "0.10.3", using: :git, submodules: false
 
   def install
-    resource("rpxy-source").stage do
-      ENV["GIT_LFS_SKIP_SMUDGE"] = "1"
-      # Configure git to skip LFS for submodules
-      system "git", "config", "filter.lfs.smudge", "cat"
-      system "git", "config", "filter.lfs.required", "false"
-      system "git", "submodule", "update", "--init", "--recursive"
-      system "cargo", "install", *std_cargo_args, "--root", prefix, "--path", "."
-    end
+    # Set environment variable to skip git-lfs
+    ENV["GIT_LFS_SKIP_SMUDGE"] = "1"
+    # Configure git to skip LFS for submodules
+    system "git", "config", "filter.lfs.smudge", "cat"
+    system "git", "config", "filter.lfs.required", "false"
+    # Update submodules manually with LFS skip configured
+    system "git", "submodule", "update", "--init", "--recursive"
+    system "cargo", "install", *std_cargo_args, "--root", prefix, "--path", "."
   end
 
   test do
