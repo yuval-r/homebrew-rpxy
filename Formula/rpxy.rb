@@ -5,6 +5,7 @@ class Rpxy < Formula
       revision: "deb01efad0a587a6bfba7f3868eb67a7a44cd311",
       using:    :git,
       submodules: false
+  version "0.10.3"
   license "Apache-2.0"
 
   depends_on "rust" => :build
