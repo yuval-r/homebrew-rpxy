@@ -7,7 +7,7 @@ class Rpxy < Formula
   license "MIT"
 
   def install
-    bin.install "rpxy-0.10.3-macos/bin/rpxy" => "rpxy"
+    bin.install "rpxy-0.10.3-macos/bin/rpxy"
   end
 
   test do
