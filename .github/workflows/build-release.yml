@@ -1,0 +1,81 @@
+name: Build and Release macOS Binary
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 0.10.3)'
+        required: true
+
+jobs:
+  build:
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout tap repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install git-lfs
+        run: |
+          brew install git-lfs
+          git lfs install
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Clone and build source
+        run: |
+          git clone --recursive --depth 1 --branch v${{ steps.version.outputs.version }} https://github.com/junkurihara/rust-rpxy.git source || \
+          git clone --recursive --depth 1 --branch ${{ steps.version.outputs.version }} https://github.com/junkurihara/rust-rpxy.git source
+          cd source
+          export GIT_LFS_SKIP_SMUDGE=1
+          git config filter.lfs.smudge cat
+          git config filter.lfs.required false
+          cargo build --release
+
+      - name: Create binary archive
+        run: |
+          mkdir -p rpxy-${{ steps.version.outputs.version }}-macos/bin
+          cp source/target/release/rpxy rpxy-${{ steps.version.outputs.version }}-macos/bin/
+          chmod +x rpxy-${{ steps.version.outputs.version }}-macos/bin/rpxy
+          tar czf rpxy-${{ steps.version.outputs.version }}-macos.tar.gz rpxy-${{ steps.version.outputs.version }}-macos/
+
+      - name: Calculate SHA256
+        id: sha256
+        run: |
+          SHA256=$(shasum -a 256 rpxy-${{ steps.version.outputs.version }}-macos.tar.gz | awk '{print $1}')
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          echo "SHA256: $SHA256"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            rpxy-${{ steps.version.outputs.version }}-macos.tar.gz
+          draft: false
+          prerelease: false
+          tag_name: v${{ steps.version.outputs.version }}
+          name: rpxy ${{ steps.version.outputs.version }} macOS
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output SHA256 for formula update
+        run: |
+          echo "SHA256: ${{ steps.sha256.outputs.sha256 }}"
+          echo "Download URL: https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/rpxy-${{ steps.version.outputs.version }}-macos.tar.gz"
+
