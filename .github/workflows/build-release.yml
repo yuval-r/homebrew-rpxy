@@ -52,10 +52,10 @@ jobs:
 
       - name: Create binary archive
         run: |
-          mkdir -p rpxy-${{ steps.version.outputs.version }}-macos/bin
-          cp source/target/release/rpxy rpxy-${{ steps.version.outputs.version }}-macos/bin/
-          chmod +x rpxy-${{ steps.version.outputs.version }}-macos/bin/rpxy
-          tar czf rpxy-${{ steps.version.outputs.version }}-macos.tar.gz rpxy-${{ steps.version.outputs.version }}-macos/
+          # Create flat tarball structure (just the binary at root, like humanitec example)
+          cp source/target/release/rpxy rpxy
+          chmod +x rpxy
+          tar czf rpxy-${{ steps.version.outputs.version }}-macos.tar.gz rpxy
 
       - name: Calculate SHA256
         id: sha256
