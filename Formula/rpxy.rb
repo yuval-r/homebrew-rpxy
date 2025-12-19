@@ -2,6 +2,7 @@ class Rpxy < Formula
   desc "Simple and ultrafast HTTP reverse proxy in Rust"
   homepage "https://rpxy.io"
   url "https://github.com/junkurihara/rust-rpxy.git", branch: "main"
+  version "0.10.2"
   license "Apache-2.0"
 
   depends_on "rust" => :build
