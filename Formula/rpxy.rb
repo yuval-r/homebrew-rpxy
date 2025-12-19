@@ -6,7 +6,8 @@ class Rpxy < Formula
   depends_on "rust" => :build
 
   # Use resource to have more control over the download process
-  # submodules: false prevents automatic submodule update during download
+  # Note: Homebrew automatically updates submodules during download if .gitmodules exists
+  # This happens before dependencies are installed, so git-lfs must be pre-installed
   resource "rpxy-source" do
     url "https://github.com/junkurihara/rust-rpxy.git",
         revision: "deb01efad0a587a6bfba7f3868eb67a7a44cd311",
