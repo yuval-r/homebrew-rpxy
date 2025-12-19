@@ -2,7 +2,7 @@ class Rpxy < Formula
   desc "Simple and ultrafast HTTP reverse proxy in Rust"
   homepage "https://rpxy.io"
   url "https://github.com/junkurihara/rust-rpxy.git",
-      revision: "deb01efad0a587a6bfba7f3868eb67a7a44cd311",
+      revision: "539284847c47ac8d28083b84891f7fe18fe4f3ef",
       using:    :git,
       submodules: false
   version "0.10.3"
