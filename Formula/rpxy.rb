@@ -8,7 +8,10 @@ class Rpxy < Formula
   # Use resource to have more control over the download process
   # submodules: false prevents automatic submodule update during download
   resource "rpxy-source" do
-    url "https://github.com/junkurihara/rust-rpxy.git", tag: "0.10.3", revision: "deb01efad0a587a6bfba7f3868eb67a7a44cd311", using: :git, submodules: false
+    url "https://github.com/junkurihara/rust-rpxy.git",
+        revision: "deb01efad0a587a6bfba7f3868eb67a7a44cd311",
+        using:    :git,
+        submodules: false
   end
 
   def install
@@ -27,5 +30,14 @@ class Rpxy < Formula
 
   test do
     system bin/"rpxy", "--help"
+  end
+
+  def caveats
+    <<~EOS
+      Note: This formula requires git-lfs to be installed before installation.
+      If you encounter errors during installation, run:
+        brew install git-lfs
+      Then try installing rpxy again.
+    EOS
   end
 end
