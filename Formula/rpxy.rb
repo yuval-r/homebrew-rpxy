@@ -5,9 +5,12 @@ class Rpxy < Formula
   version "0.10.2"
   license "Apache-2.0"
 
+  depends_on "git-lfs" => :build
   depends_on "rust" => :build
 
   def install
+    system "git", "lfs", "install"
+    system "git", "submodule", "update", "--init", "--recursive"
     system "cargo", "build", "--release"
     bin.install "target/release/rpxy"
   end
